@@ -90,16 +90,16 @@ jobs:
           podman manifest exists test:v1
           
           echo "Check result: linux/amd64"
-          RESULT=$(podman run --rm --platform linux/amd64 test:v1)
+          RESULT=$(podman run --rm --platform linux/amd64 localhost/test:v1)
           echo $RESULT
           test "$RESULT" == "amd64"
           
           echo "Check result: linux/arm64"
-          RESULT=$(podman run --rm --platform linux/arm64 test:v1)
+          RESULT=$(podman run --rm --platform linux/arm64 localhost/test:v1)
           echo $RESULT
           test "$RESULT" == "arm64"
           
           echo "Check result: linux/arm"
-          RESULT=$(podman run --rm --platform linux/arm test:v1)
+          RESULT=$(podman run --rm --platform linux/arm localhost/test:v1)
           echo $RESULT
           test "$RESULT" == "arm"
