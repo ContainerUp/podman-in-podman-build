@@ -59267,13 +59267,13 @@ class Podman {
     image,
     cmds
   ) {
-    const args = ['-d', '--name', name]
+    const args = ['run', '-d', '--name', name]
 
     for (const dev of devices) {
       args.push('--device', dev)
     }
     for (const v of volumes) {
-      args.push('--v', v)
+      args.push('-v', v)
     }
     if (user) {
       args.push('--user', user)
@@ -59478,6 +59478,7 @@ class PodmanInPodman {
 async function createPodmanInPodman(podman, githubWorkdir, workdir, image) {
   const tmpDir = await tempDir()
 
+  core.startGroup(`✨ [PodmanInPodman] Creating podman-in-podman container...`)
   const podmanContainer = await podman.runDetachedContainer(
     'podmaninpodman',
     ['/dev/fuse:rw'],
@@ -59487,6 +59488,7 @@ async function createPodmanInPodman(podman, githubWorkdir, workdir, image) {
     image,
     sleepCmd
   )
+  core.endGroup()
 
   return new PodmanInPodman(podman, podmanContainer)
 }
