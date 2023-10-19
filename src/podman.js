@@ -193,10 +193,7 @@ class PodmanInPodman {
         labels
       )
 
-      await this.exportAndImportToHost(
-        repoTagWithPlatform(repoTag, platform),
-        true
-      )
+      await this.exportAndImportToHost(repoTag, true)
 
       if (tags.length > 1) {
         await this.podman.tagImage(repoTag, tags.slice(1))
