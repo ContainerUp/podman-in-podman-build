@@ -182,7 +182,7 @@ class PodmanInPodman {
       return
     }
 
-    await this.createManifest(repoTag)
+    await this.podman.manifestCreate(repoTag)
     for (const platform of platforms) {
       await this.buildSinglePlatform(
         containerfile,
@@ -205,18 +205,16 @@ class PodmanInPodman {
   }
 
   async exportAndImportToHost(repoTag, isManifest = false) {
-    const normalizedRepoTag = repoTag.replace('/', '_')
+    const normalizedRepoTag = repoTag.replace('/', '_').replace(':', '_')
     const archiveExport = path.join(mountPoint, `${normalizedRepoTag}.tar`)
     const archiveImport = path.join(await tempDir(), `${normalizedRepoTag}.tar`)
 
-    core.startGroup(`➡️ [PodmanInPodman] Copying image ${repoTag}...`)
     await this.export(repoTag, archiveExport)
     if (!isManifest) {
-      await this.importToHostImage(archiveImport)
+      await this.podman.loadImage(archiveImport)
     } else {
-      await this.importToHostManifest(repoTag, archiveImport)
+      await this.podman.manifestAddArchive(repoTag, archiveImport)
     }
-    core.endGroup()
   }
 
   async export(repoTag, archive) {
@@ -227,26 +225,6 @@ class PodmanInPodman {
     if (exitCode !== 0) {
       throw new Error(`PodmanInPodman exited with code ${exitCode}`)
     }
-    core.endGroup()
-  }
-
-  async importToHostImage(archive) {
-    core.startGroup(`📦 [PodmanInPodman] Importing image to host...`)
-    await this.podman.loadImage(archive)
-    core.endGroup()
-  }
-
-  async createManifest(manifest) {
-    core.startGroup(`📦 [PodmanInPodman] Create manifest ${manifest}...`)
-    await this.podman.manifestCreate(manifest)
-    core.endGroup()
-  }
-
-  async importToHostManifest(manifest, archive) {
-    core.startGroup(
-      `📦 [PodmanInPodman] Importing image to host manifest ${manifest}...`
-    )
-    await this.podman.manifestAddArchive(manifest, archive)
     core.endGroup()
   }
 
