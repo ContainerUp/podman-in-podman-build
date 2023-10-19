@@ -89,27 +89,25 @@ jobs:
           echo "Check manifest: test:v1"
           podman manifest exists test:v1
           
-          # We have to select image manually on older versions of podman
+          # We have to select image manually on older versions of podman.
+          # Specifying an image with sha256 hash is NOT working.
+          # Load the image again.
           # Reference: https://github.com/containers/podman/pull/14827
           
-          set -x
           echo "Check result: linux/amd64"
-          DIGEST=$(podman manifest inspect test:v1 | jq -r '.manifests[] | select(.platform.architecture=="amd64") | .digest')
-          echo "Image digest: $DIGEST"
-          RESULT=$(podman run --rm localhost/test:v1@$DIGEST)
+          podman load -i ${RUNNER_TEMP}/podman-in-podman-build/test_latest_linux_amd64.tar
+          RESULT=$(podman run --rm localhost/test:latest_linux_amd64)
           echo $RESULT
           test "$RESULT" == "amd64"
           
           echo "Check result: linux/arm64"
-          DIGEST=$(podman manifest inspect test:v1 | jq -r '.manifests[] | select(.platform.architecture=="arm64") | .digest')
-          echo "Image digest: $DIGEST"
-          RESULT=$(podman run --rm localhost/test:v1@$DIGEST)
+          podman load -i ${RUNNER_TEMP}/podman-in-podman-build/test_latest_linux_arm64.tar
+          RESULT=$(podman run --rm localhost/test:latest_linux_arm64)
           echo $RESULT
           test "$RESULT" == "arm64"
           
           echo "Check result: linux/arm"
-          DIGEST=$(podman manifest inspect test:v1 | jq -r '.manifests[] | select(.platform.architecture=="arm") | .digest')
-          echo "Image digest: $DIGEST"
-          RESULT=$(podman run --rm localhost/test:v1@$DIGEST)
+          podman load -i ${RUNNER_TEMP}/podman-in-podman-build/test_latest_linux_arm.tar
+          RESULT=$(podman run --rm localhost/test:latest_linux_arm)
           echo $RESULT
           test "$RESULT" == "arm"
