@@ -10,7 +10,7 @@ inputs:
   platforms:
     description: 'Build container images with the specified OS/ARCH'
   podman-image:
-    description: 'The image:tag of Podman to run'
+    description: 'The repository:tag of Podman to be run in the container'
     default: 'quay.io/containers/podman:latest'
   repository:
     required: true
@@ -23,7 +23,7 @@ inputs:
   labels:
     description: 'Set metadata for an image'
   cache-podman-image:
-    description: 'Cache the Podman image'
+    description: 'Cache the Podman image, and load the image from cache'
     default: 'true'
 
 runs:
