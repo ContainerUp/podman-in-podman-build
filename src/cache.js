@@ -40,7 +40,7 @@ async function savePodmanImageCache(podman, podmanImage) {
   }
 
   const archive = path.join(await tempDir(), cachePodmanArchive)
-  const key = `${cacheKeyContainerImage},${podmanImage}`
+  const key = `${cacheKeyContainerImage}-${podmanImage}`
 
   await podman.saveImage(podmanImage, archive)
 

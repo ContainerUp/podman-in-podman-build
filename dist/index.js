@@ -59082,7 +59082,7 @@ async function savePodmanImageCache(podman, podmanImage) {
   }
 
   const archive = path.join(await tempDir(), cachePodmanArchive)
-  const key = `${cacheKeyContainerImage},${podmanImage}`
+  const key = `${cacheKeyContainerImage}-${podmanImage}`
 
   await podman.saveImage(podmanImage, archive)
 
@@ -59404,7 +59404,15 @@ class PodmanInPodman {
   }
 
   async export(repoTag, archive) {
-    const args = ['podman', 'save', '-o', archive, repoTag]
+    const args = [
+      'podman',
+      'save',
+      '--format',
+      'oci-archive',
+      '-o',
+      archive,
+      repoTag
+    ]
 
     core.startGroup(`📦 [PodmanInPodman] Exporting image ${repoTag}...`)
     const exitCode = await this.container.exec(args)

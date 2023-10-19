@@ -218,7 +218,15 @@ class PodmanInPodman {
   }
 
   async export(repoTag, archive) {
-    const args = ['podman', 'save', '-o', archive, repoTag]
+    const args = [
+      'podman',
+      'save',
+      '--format',
+      'oci-archive',
+      '-o',
+      archive,
+      repoTag
+    ]
 
     core.startGroup(`📦 [PodmanInPodman] Exporting image ${repoTag}...`)
     const exitCode = await this.container.exec(args)
