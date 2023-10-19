@@ -59055,7 +59055,7 @@ async function loadPodmanImageCache(podman, podmanImage) {
   }
 
   const archive = path.join(await tempDir(), cachePodmanArchive)
-  const key = `${cacheKeyContainerImage},${podmanImage}`
+  const key = `${cacheKeyContainerImage}-${podmanImage}`
 
   core.startGroup('⬇️ Downloading Podman image from cache...')
   const hit = await cache.restoreCache([archive], key)
