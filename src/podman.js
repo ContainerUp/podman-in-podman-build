@@ -64,7 +64,7 @@ class Podman {
   }
 
   async tagImage(image, tags) {
-    core.startGroup(`🏷️ [Podman] Add tags to ${image}...`)
+    core.startGroup(`🏷️ [Podman] Add tags...`)
     const exitCode = await exec.exec(this.podman, ['tag', image, ...tags])
     if (exitCode !== 0) {
       throw new Error(`Podman exited with code ${exitCode}`)
@@ -130,7 +130,7 @@ class Container {
     args.push(this.name)
 
     core.startGroup(`🚫 [Podman] Removing container ${this.name}...`)
-    const exitCode = await exec.exec(this.podman, ['rm', ...args])
+    const exitCode = await exec.exec(this.podmanExec, args)
     if (exitCode !== 0) {
       throw new Error(`Podman exited with code ${exitCode}`)
     }
@@ -177,7 +177,8 @@ class PodmanInPodman {
       await this.exportAndImportToHost(repoTag)
 
       if (tags.length > 1) {
-        await this.podman.tagImage(repoTag, tags.slice(1))
+        const tagsToAdd = tags.slice(1).map(tag => `${repository}:${tag}`)
+        await this.podman.tagImage(repoTag, tagsToAdd)
       }
       return
     }
@@ -199,7 +200,8 @@ class PodmanInPodman {
       )
 
       if (tags.length > 1) {
-        await this.podman.tagImage(repoTag, tags.slice(1))
+        const tagsToAdd = tags.slice(1).map(tag => `${repository}:${tag}`)
+        await this.podman.tagImage(repoTag, tagsToAdd)
       }
     }
   }
