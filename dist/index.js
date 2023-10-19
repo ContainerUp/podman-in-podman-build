@@ -59379,7 +59379,10 @@ class PodmanInPodman {
         labels
       )
 
-      await this.exportAndImportToHost(repoTag, true)
+      await this.exportAndImportToHost(
+        repoTagWithPlatform(repoTag, platform),
+        repoTag
+      )
 
       if (tags.length > 1) {
         await this.podman.tagImage(repoTag, tags.slice(1))
@@ -59387,16 +59390,16 @@ class PodmanInPodman {
     }
   }
 
-  async exportAndImportToHost(repoTag, isManifest = false) {
+  async exportAndImportToHost(repoTag, manifest = '') {
     const normalizedRepoTag = repoTag.replace('/', '_').replace(':', '_')
     const archiveExport = path.join(mountPoint, `${normalizedRepoTag}.tar`)
     const archiveImport = path.join(await tempDir(), `${normalizedRepoTag}.tar`)
 
     await this.export(repoTag, archiveExport)
-    if (!isManifest) {
+    if (!manifest) {
       await this.podman.loadImage(archiveImport)
     } else {
-      await this.podman.manifestAddArchive(repoTag, archiveImport)
+      await this.podman.manifestAddArchive(manifest, archiveImport)
     }
   }
 
@@ -59724,6 +59727,7 @@ const { cleanup } = __nccwpck_require__(9018)
 const core = __nccwpck_require__(2186)
 
 if (!core.getState('isPost')) {
+  core.saveState('isPost', 'true')
   run()
 } else {
   cleanup()
