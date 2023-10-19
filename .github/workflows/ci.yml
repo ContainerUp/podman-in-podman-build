@@ -49,12 +49,57 @@ jobs:
         id: checkout
         uses: actions/checkout@v4
 
-      - name: Test Local Action
+      - name: Create files
+        run: |
+          echo -n amd64 > arch_amd64
+          echo -n arm64 > arch_arm64
+          echo -n arm > arch_arm
+          
+          cat > Containerfile <<EOF
+          FROM docker.io/library/alpine:3.18
+          ARG TARGETARCH
+          COPY arch_\$TARGETARCH /arch
+          CMD cat /arch
+          EOF
+
+      - name: Run Local Action
         id: test-action
         uses: ./
         with:
-          milliseconds: 1000
+          platforms: |
+            linux/amd64
+            linux/arm64
+            linux/arm
+          podman-image: quay.io/containers/podman:v4.6
+          repository: test
+          tags: |
+            latest
+            v1
 
-      - name: Print Output
-        id: output
-        run: echo "${{ steps.test-action.outputs.time }}"
+      - name: Install qemu dependency
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-user-static
+
+      - name: Test images
+        run: |
+          echo "Check manifest: test:latest"
+          podman manifest exists test:latest
+          
+          echo "Check manifest: test:v1"
+          podman manifest exists test:v1
+          
+          echo "Check result: linux/amd64"
+          RESULT=$(podman run --rm --platform linux/amd64 test:v1)
+          echo $RESULT
+          test "$RESULT" == "amd64"
+          
+          echo "Check result: linux/arm64"
+          RESULT=$(podman run --rm --platform linux/arm64 test:v1)
+          echo $RESULT
+          test "$RESULT" == "arm64"
+          
+          echo "Check result: linux/arm"
+          RESULT=$(podman run --rm --platform linux/arm test:v1)
+          echo $RESULT
+          test "$RESULT" == "arm"
