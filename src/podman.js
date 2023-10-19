@@ -198,11 +198,10 @@ class PodmanInPodman {
         repoTagWithPlatform(repoTag, platform),
         repoTag
       )
-
-      if (tags.length > 1) {
-        const tagsToAdd = tags.slice(1).map(tag => `${repository}:${tag}`)
-        await this.podman.tagImage(repoTag, tagsToAdd)
-      }
+    }
+    if (tags.length > 1) {
+      const tagsToAdd = tags.slice(1).map(tag => `${repository}:${tag}`)
+      await this.podman.tagImage(repoTag, tagsToAdd)
     }
   }
 
