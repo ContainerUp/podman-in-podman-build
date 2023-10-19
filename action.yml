@@ -1,18 +1,30 @@
-name: 'The name of your action here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Podman-in-Podman Build'
+description: 'Build container images with Podman in Podman'
+author: 'ContainerUp'
 
-# Define your inputs here.
 inputs:
-  milliseconds:
-    description: 'Your input description here'
+  workdir:
+    description: 'Relative path under $GITHUB_WORKSPACE to build the image'
+  containerfile:
+    description: 'Path of Containerfile'
+  platforms:
+    description: 'Build container images with the specified OS/ARCH'
+  podman-image:
+    description: 'The image:tag of Podman to run'
+    default: 'quay.io/containers/podman:latest'
+  repository:
     required: true
-    default: '1000'
-
-# Define your outputs here.
-outputs:
-  time:
-    description: 'Your output description here'
+    description: 'The built image will be tagged as <repository>:<tags[0]>, <repository>:<tags[1]>, ...'
+  tags:
+    description: 'The built image will be tagged as <repository>:<tags[0]>, <repository>:<tags[1]>, ...'
+    default: 'latest'
+  build-args:
+    description: 'List of argument=value to supply to the builder'
+  labels:
+    description: 'Set metadata for an image'
+  cache-podman-image:
+    description: 'Cache the Podman image'
+    default: 'true'
 
 runs:
   using: node20

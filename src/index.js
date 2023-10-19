@@ -2,5 +2,11 @@
  * The entrypoint for the action.
  */
 const { run } = require('./main')
+const { cleanup } = require('./cleanup')
+const core = require('@actions/core')
 
-run()
+if (!core.getState('isPost')) {
+  run()
+} else {
+  cleanup()
+}

@@ -1,5 +1,7 @@
 const core = require('@actions/core')
-const { wait } = require('./wait')
+const io = require('@actions/io')
+const { Podman, createPodmanInPodman } = require('./podman')
+const { loadPodmanImageCache } = require('./cache')
 
 /**
  * The main function for the action.
@@ -7,18 +9,34 @@ const { wait } = require('./wait')
  */
 async function run() {
   try {
-    const ms = core.getInput('milliseconds', { required: true })
+    const podman = new Podman(await io.which('podman', true))
+    const podmanImage = core.getInput('podman-image')
+    await loadPodmanImageCache(podman, podmanImage)
 
-    // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-    core.debug(`Waiting ${ms} milliseconds ...`)
+    const containerfile = core.getInput('containerfile')
+    const platforms = core.getMultilineInput('platforms')
+    const workdir = core.getInput('workdir')
+    const repo = core.getInput('repository', { required: true })
+    const tags = core.getMultilineInput('tags', { required: true })
+    const buildArgs = core.getMultilineInput('build-args')
+    const labels = core.getMultilineInput('labels')
 
-    // Log the current timestamp, wait, then log the new timestamp
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    const pmipm = await createPodmanInPodman(
+      podman,
+      process.cwd(),
+      workdir,
+      podmanImage
+    )
 
-    // Set outputs for other workflow steps to use
-    core.setOutput('time', new Date().toTimeString())
+    await pmipm.build(
+      containerfile,
+      workdir,
+      platforms,
+      repo,
+      tags,
+      buildArgs,
+      labels
+    )
   } catch (error) {
     // Fail the workflow run if an error occurs
     core.setFailed(error.message)
