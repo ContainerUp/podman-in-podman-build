@@ -2,6 +2,7 @@ const io = require('@actions/io')
 const core = require('@actions/core')
 const { Podman } = require('./podman')
 const { savePodmanImageCache } = require('./cache')
+const { fixOwner } = require('./temp')
 
 async function cleanup() {
   try {
@@ -11,6 +12,8 @@ async function cleanup() {
 
     const podmanContainer = podman.getContainer('podmaninpodman')
     await podmanContainer.remove(true)
+
+    await fixOwner()
   } catch (error) {
     // Fail the workflow run if an error occurs
     core.setFailed(error.message)

@@ -59106,6 +59106,7 @@ const io = __nccwpck_require__(7436)
 const core = __nccwpck_require__(2186)
 const { Podman } = __nccwpck_require__(1063)
 const { savePodmanImageCache } = __nccwpck_require__(2121)
+const { fixOwner } = __nccwpck_require__(5418)
 
 async function cleanup() {
   try {
@@ -59115,6 +59116,8 @@ async function cleanup() {
 
     const podmanContainer = podman.getContainer('podmaninpodman')
     await podmanContainer.remove(true)
+
+    await fixOwner()
   } catch (error) {
     // Fail the workflow run if an error occurs
     core.setFailed(error.message)
@@ -59492,11 +59495,10 @@ const io = __nccwpck_require__(7436)
 const path = __nccwpck_require__(1017)
 const exec = __nccwpck_require__(1514)
 
+const tmp = path.join(process.env.RUNNER_TEMP, 'podman-in-podman-build')
 let temDirCreated = false
 
 async function tempDir() {
-  const tmp = path.join(process.env.RUNNER_TEMP, 'podman-in-podman-build')
-
   if (!temDirCreated) {
     await io.mkdirP(tmp)
     await exec.exec(await io.which('chmod', true), ['777', tmp])
@@ -59506,7 +59508,16 @@ async function tempDir() {
   return tmp
 }
 
-module.exports = { tempDir }
+async function fixOwner() {
+  await exec.exec(await io.which('sudo', true), [
+    'chown',
+    '-R',
+    process.env.USER,
+    tmp
+  ])
+}
+
+module.exports = { tempDir, fixOwner }
 
 
 /***/ }),
