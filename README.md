@@ -33,6 +33,8 @@ A temporary directory `${RUNNER_TEMP}/podman-in-podman-build` is created, and th
 
 The `current working directory`, `${RUNNER_TEMP}/podman-in-podman-build` are mounted in the container.
 
+The device `/dev/fuse` is also mounted, for the Podman in the container to run correctly.
+
 The container is named `podmaninpodman`.
 
 ### 2. Run build commands in the container
