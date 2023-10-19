@@ -59481,6 +59481,7 @@ module.exports = { Podman, createPodmanInPodman }
 
 const io = __nccwpck_require__(7436)
 const path = __nccwpck_require__(1017)
+const exec = __nccwpck_require__(1514)
 
 let temDirCreated = false
 
@@ -59489,6 +59490,7 @@ async function tempDir() {
 
   if (!temDirCreated) {
     await io.mkdirP(tmp)
+    await exec.exec(await io.which('chmod', true), ['777', tmp])
     temDirCreated = true
   }
 
