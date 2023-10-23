@@ -59078,6 +59078,7 @@ async function savePodmanImageCache(podman, podmanImage) {
   }
   if (core.getState(cacheHitPodman) === 'true') {
     // Cache hit, no need to save cache
+    console.log('🎯 Cache hit, no need to upload Podman image to cache')
     return
   }
 
@@ -59239,7 +59240,7 @@ class Podman {
   }
 
   async manifestAddArchive(manifest, archive) {
-    core.startGroup(`🏷️ [Podman] Add an archive manifest ${manifest}...`)
+    core.startGroup(`🏷️ [Podman] Add an archive to manifest ${manifest}...`)
     const exitCode = await exec.exec(this.podman, [
       'manifest',
       'add',
@@ -59491,11 +59492,15 @@ module.exports = { Podman, createPodmanInPodman }
 /***/ 5418:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+const core = __nccwpck_require__(2186)
 const io = __nccwpck_require__(7436)
 const path = __nccwpck_require__(1017)
 const exec = __nccwpck_require__(1514)
 
-const tmp = path.join(process.env.RUNNER_TEMP, 'podman-in-podman-build')
+const tmp = path.join(
+  process.env.RUNNER_TEMP || '/tmp',
+  'podman-in-podman-build'
+)
 let temDirCreated = false
 
 async function tempDir() {
@@ -59509,12 +59514,14 @@ async function tempDir() {
 }
 
 async function fixOwner() {
+  core.startGroup('🔨 Fixing ownerships of temporary files...')
   await exec.exec(await io.which('sudo', true), [
     'chown',
     '-R',
     process.env.USER,
     tmp
   ])
+  core.endGroup()
 }
 
 module.exports = { tempDir, fixOwner }

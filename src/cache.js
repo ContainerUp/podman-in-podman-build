@@ -36,6 +36,7 @@ async function savePodmanImageCache(podman, podmanImage) {
   }
   if (core.getState(cacheHitPodman) === 'true') {
     // Cache hit, no need to save cache
+    console.log('🎯 Cache hit, no need to upload Podman image to cache')
     return
   }
 

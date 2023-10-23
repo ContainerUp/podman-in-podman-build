@@ -50,7 +50,7 @@ class Podman {
   }
 
   async manifestAddArchive(manifest, archive) {
-    core.startGroup(`🏷️ [Podman] Add an archive manifest ${manifest}...`)
+    core.startGroup(`🏷️ [Podman] Add an archive to manifest ${manifest}...`)
     const exitCode = await exec.exec(this.podman, [
       'manifest',
       'add',
